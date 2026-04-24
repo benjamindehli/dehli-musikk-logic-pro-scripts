@@ -22,5 +22,7 @@
         "scripter",
         "scripter-plugin"
     ],
-    "devDependencies": {}
+    "dependencies": {
+        "@benjamindehli/logic-pro-script-compiler": "^1.0.7"
+    }
 }
