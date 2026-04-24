@@ -1,7 +1,7 @@
 {
     "name": "@benjamindehli/dehli-musikk-logic-pro-scripts",
     "version": "0.0.1",
-    "description": "- [Chase Bliss Audio & Meris CXM 1978](Chase%20Bliss%20Audio%20&%20Meris%20CXM%201978/) - [DigiTech Whammy](DigiTech%20Whammy/) - [Elektron SidStation](Elektron%20SidStation/) - [Omni-84](Omni-84/)",
+    "description": "Logic Pro Scripter scripts for Chase Bliss Audio & Meris CXM 1978, DigiTech Whammy, Elektron SidStation, and Omni-84",
     "homepage": "https://github.com/benjamindehli/LogicPro-Scripts#readme",
     "bugs": {
         "url": "https://github.com/benjamindehli/LogicPro-Scripts/issues"
@@ -12,9 +12,11 @@
     },
     "author": "Benjamin Dehli",
     "license": "GPL-3.0",
-    "type": "commonjs",
-    "main": "index.js",
+    "files": [
+        "build"
+    ],
     "scripts": {
+        "build": "logic-pro-script-compiler --input src/scripts --output build",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "keywords": [
@@ -22,7 +24,7 @@
         "scripter",
         "scripter-plugin"
     ],
-    "dependencies": {
+    "devDependencies": {
         "@benjamindehli/logic-pro-script-compiler": "^1.0.7"
     }
 }
