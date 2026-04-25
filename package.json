@@ -26,5 +26,7 @@
     ],
     "devDependencies": {
         "@benjamindehli/logic-pro-script-compiler": "^1.0.7"
+    "dependencies": {
+        "@benjamindehli/logic-pro-scripter-utils": "^1.0.0"
     }
 }
