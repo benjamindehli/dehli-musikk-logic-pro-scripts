@@ -5,11 +5,13 @@
 /* https://www.dehlimusikk.no/       */
 /*************************************/
 
+import type { Event as EventInstance } from "@benjamindehli/logic-pro-scripter-utils";
+
 const cc = new ControlChange();
 const pc = new ProgramChange();
-let mode;
+let mode: number;
 
-const PluginParameters = [
+const PluginParameters: ScripterPluginParameter[] = [
     {
         name: "DigiTech Whammy",
         type: "text"
@@ -23,8 +25,19 @@ const PluginParameters = [
     }
 ];
 
+interface WhammyMidiData {
+    program: number;
+    value: number;
+}
 
-function getMidiDataForWhammy(pitch, mode) {
+interface PitchMapping {
+    min: number;
+    max: number;
+    idx: number;
+    prog: [number, number];
+}
+
+function getMidiDataForWhammy(pitch: number, currentMode: number): WhammyMidiData | null {
     const convertedNoteValues = [
         [127, 124, 120, 117, 113, 109, 106, 102, 99, 95, 92, 88], // DIVE BOMB
         [127, 122, 116, 111, 106, 101, 95, 90, 85, 79, 74, 69], // 2 OCT DOWN
@@ -32,14 +45,13 @@ function getMidiDataForWhammy(pitch, mode) {
         [127, 109], // 5TH DOWN
         [127, 102, 76], // 4TH DOWN
         [127, 63, 0], // 2ND DOWN
-        [25, 51, 76, 102, 127], //4TH UP
+        [25, 51, 76, 102, 127], // 4TH UP
         [109, 127], // 5TH UP
         [85, 95, 106, 116, 127], // 1 OCT UP
         [69, 74, 79, 85, 90, 95, 101, 106, 111, 116, 122, 127] // 2 OCT UP
     ];
 
-    // Define pitch ranges and their corresponding data
-    const pitchMappings = [
+    const pitchMappings: PitchMapping[] = [
         { min: 12, max: 23, idx: 0, prog: [9, 51] },
         { min: 24, max: 35, idx: 1, prog: [8, 50] },
         { min: 36, max: 40, idx: 2, prog: [7, 49] },
@@ -56,11 +68,10 @@ function getMidiDataForWhammy(pitch, mode) {
         return null;
     }
 
-    for (const element of pitchMappings) {
-        const mapping = element;
+    for (const mapping of pitchMappings) {
         if (pitch >= mapping.min && pitch <= mapping.max) {
             return {
-                program: mode === 1 ? mapping.prog[1] : mapping.prog[0],
+                program: currentMode === 1 ? mapping.prog[1] : mapping.prog[0],
                 value: convertedNoteValues[mapping.idx][pitch - mapping.min]
             };
         }
@@ -68,23 +79,21 @@ function getMidiDataForWhammy(pitch, mode) {
     return null;
 }
 
-function sendMidiDataToWhammy(midiData, event) {
-    // Program Change
+function sendMidiDataToWhammy(midiData: WhammyMidiData, event: EventInstance): void {
     pc.number = midiData.program;
     pc.send();
 
-    // Control Change
     cc.number = 11;
     cc.value = midiData.value;
     cc.channel = event.channel;
     cc.send();
 }
 
-function ParameterChanged(param, value) {
+function ParameterChanged(param: number, value: number): void {
     if (param === 1) mode = value;
 }
 
-function HandleMIDI(event) {
+function HandleMIDI(event: EventInstance): void {
     event.send();
     if (event instanceof Note) {
         const midiData = getMidiDataForWhammy(event.pitch, mode);

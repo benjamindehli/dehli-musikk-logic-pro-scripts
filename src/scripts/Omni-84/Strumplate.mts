@@ -5,9 +5,12 @@
 /* https://www.dehlimusikk.no/       */
 /*************************************/
 
-let strumTime, highestNote, lowestNote, strumDirection, orderNotes;
+import type { Event as EventInstance } from "@benjamindehli/logic-pro-scripter-utils";
+import { randomizeArray } from "../../functions/utils.mjs";
 
-const chords = {
+let strumTime: number, highestNote: number, lowestNote: number, strumDirection: number, orderNotes: boolean;
+
+const chords: Record<number, number[]> = {
     36: [48, 52, 43, 60, 64, 55, 72, 76, 67, 84, 88, 79, 96],
     37: [49, 53, 44, 61, 65, 56, 73, 77, 68, 85, 89, 80, 97],
     38: [50, 42, 45, 62, 54, 57, 74, 66, 69, 86, 78, 81, 98],
@@ -94,7 +97,7 @@ const chords = {
     119: [47, 51, 43, 59, 63, 55, 71, 75, 67, 83, 87, 79, 95]
 };
 
-function triggerNote(pitch, delay) {
+function triggerNote(pitch: number, delay: number): void {
     const noteOn = new NoteOn();
     noteOn.pitch = pitch;
     noteOn.sendAfterMilliseconds(delay);
@@ -103,35 +106,31 @@ function triggerNote(pitch, delay) {
     noteOff.sendAfterMilliseconds(delay + 100);
 }
 
-function orderChordNotes(chord) {
+function orderChordNotes(chord: number[]): number[] {
     if (orderNotes) {
-        return [...chord].sort(function (a, b) {
-            return a - b;
-        });
-    } else {
-        return chord;
+        return [...chord].sort((a, b) => a - b);
     }
+    return chord;
 }
 
-function shrinkChord(chord) {
+function shrinkChord(chord: number[]): number[] {
     if (lowestNote !== 1 || highestNote !== 13) {
         return chord.slice(lowestNote - 1, highestNote);
-    } else {
-        return chord;
     }
+    return chord;
 }
 
-function arrangeChord(chord) {
+function arrangeChord(chord: number[]): number[] {
     if (strumDirection === 0) {
         return chord;
     } else if (strumDirection === 1) {
         return [...chord].reverse();
-    } else if (strumDirection === 2) {
+    } else {
         return randomizeArray([...chord]);
     }
 }
 
-function HandleMIDI(event) {
+function HandleMIDI(event: EventInstance): void {
     if (event instanceof NoteOn) {
         const isChord = event.pitch >= 36 && event.pitch <= 119;
         const hasNotes = lowestNote <= highestNote;
@@ -143,8 +142,7 @@ function HandleMIDI(event) {
             chord = arrangeChord(chord);
             if (chord) {
                 for (let i = 0; i < chord.length; i++) {
-                    const pitch = chord[i];
-                    triggerNote(pitch, strumTime * i);
+                    triggerNote(chord[i], strumTime * i);
                 }
             }
         }
@@ -155,7 +153,7 @@ function HandleMIDI(event) {
     }
 }
 
-function ParameterChanged(param, value) {
+function ParameterChanged(param: number, value: number): void {
     if (param === 1) strumTime = 400 - value;
     else if (param === 2) lowestNote = value;
     else if (param === 3) highestNote = value;
@@ -163,7 +161,7 @@ function ParameterChanged(param, value) {
     else if (param === 5) orderNotes = value === 1;
 }
 
-const PluginParameters = [
+const PluginParameters: ScripterPluginParameter[] = [
     {
         name: "Omni-84 Strumplate",
         type: "text"

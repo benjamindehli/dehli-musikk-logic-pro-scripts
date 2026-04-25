@@ -5,9 +5,11 @@
 /* https://www.dehlimusikk.no/       */
 /*************************************/
 
+import type { Event as EventInstance, NoteOn as NoteOnInstance } from "@benjamindehli/logic-pro-scripter-utils";
+
 const cc = new ControlChange();
 
-const PluginParameters = [
+const PluginParameters: ScripterPluginParameter[] = [
     {
         name: "SidStation",
         type: "text"
@@ -28,7 +30,7 @@ const PluginParameters = [
     }
 ];
 
-function getConvertedNoteValue(pitch) {
+function getConvertedNoteValue(pitch: number): number {
     const convertedNoteValues = [
         1, 1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14, 16, 17, 18, 20, 21, 22, 23, 24, 26, 27, 28, 30, 31, 32, 34, 35, 36, 37,
         39, 40, 41, 43, 44, 45, 47, 48, 49, 51, 52, 53, 54, 55, 57, 58, 59, 61, 62, 63, 64, 66, 67, 68, 69, 71, 72, 73,
@@ -39,17 +41,17 @@ function getConvertedNoteValue(pitch) {
     return convertedNoteValues[pitch];
 }
 
-function getCcNumberForOscillatorPitch(oscillator) {
-    const oscillatorPitchCcNumbers = [null, 35, 51, 73];
-    return oscillatorPitchCcNumbers[oscillator];
+function getCcNumberForOscillatorPitch(oscillator: number): number | null {
+    const oscillatorPitchCcNumbers: (number | null)[] = [null, 35, 51, 73];
+    return oscillatorPitchCcNumbers[oscillator] ?? null;
 }
 
-function getCcNumberForOscillatorActivation(oscillator) {
-    const oscillatorCcNumbers = [null, 24, 25, 26];
-    return oscillatorCcNumbers[oscillator];
+function getCcNumberForOscillatorActivation(oscillator: number): number | null {
+    const oscillatorCcNumbers: (number | null)[] = [null, 24, 25, 26];
+    return oscillatorCcNumbers[oscillator] ?? null;
 }
 
-function toggleOscillatorActivation(active, oscillator, event) {
+function toggleOscillatorActivation(active: boolean, oscillator: number, event: EventInstance): void {
     const oscillatorActivationCcNumber = getCcNumberForOscillatorActivation(oscillator);
     if (oscillatorActivationCcNumber !== null) {
         cc.number = oscillatorActivationCcNumber;
@@ -59,15 +61,15 @@ function toggleOscillatorActivation(active, oscillator, event) {
     }
 }
 
-function activateOscillator(oscillator, event) {
+function activateOscillator(oscillator: number, event: EventInstance): void {
     toggleOscillatorActivation(true, oscillator, event);
 }
 
-function deactivateOscillator(oscillator, event) {
+function deactivateOscillator(oscillator: number, event: EventInstance): void {
     toggleOscillatorActivation(false, oscillator, event);
 }
 
-function sendOscillatorPitch(oscillatorPitchCcNumber, event) {
+function sendOscillatorPitch(oscillatorPitchCcNumber: number, event: NoteOnInstance): void {
     const convertedNoteValue = getConvertedNoteValue(event.pitch);
     cc.number = oscillatorPitchCcNumber;
     cc.value = convertedNoteValue;
@@ -75,7 +77,7 @@ function sendOscillatorPitch(oscillatorPitchCcNumber, event) {
     cc.send();
 }
 
-function HandleMIDI(event) {
+function HandleMIDI(event: EventInstance): void {
     event.send();
     if (event instanceof Note) {
         const oscillator = GetParameter("Oscillator");

@@ -9,7 +9,7 @@ import { getBooleanCcFromValue, getParamNameFromParamIndex, sendCcValue } from "
 
 const cc = new ControlChange();
 
-const PluginParameters = [
+const PluginParameters: ScripterPluginParameter[] = [
     {
         name: "Oscillator",
         type: "menu",
@@ -165,40 +165,40 @@ const PluginParameters = [
     }
 ];
 
-function getPitchCcFromValue(value) {
+function getPitchCcFromValue(value: number): number {
     const pitchCcValues = [
         0, 1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14, 16, 17, 18, 20, 21, 22, 23, 24, 26, 27, 28, 30, 31, 32, 34, 35, 36, 37,
         39, 40, 41, 43, 44, 45, 47, 48, 49, 51, 52, 53, 54, 55, 57, 58, 59, 61, 62, 63, 64, 66, 67, 68, 69, 71, 72, 73,
         75, 76, 77, 78, 80, 81, 82, 84, 85, 86, 88, 89, 90, 91, 93, 94, 95, 97, 98, 99, 100, 101, 103, 104, 105, 107,
         108, 109, 111, 112, 113, 114, 116, 117, 118, 120, 121, 122, 123, 125, 126, 127
     ];
-    return pitchCcValues[value] || 0;
+    return pitchCcValues[value] ?? 0;
 }
 
-function getTransposeCcFromValue(value) {
+function getTransposeCcFromValue(value: number): number {
     const pitchCcValues = [
         0, 2, 4, 7, 10, 12, 15, 18, 20, 23, 26, 28, 31, 34, 36, 39, 42, 44, 47, 50, 52, 55, 58, 60, 63, 65, 68, 71, 73,
         76, 79, 81, 84, 87, 89, 92, 95, 97, 100, 103, 105, 108, 111, 113, 116, 119, 121, 124, 127
     ];
-    return pitchCcValues[value + 24] || 0;
+    return pitchCcValues[value + 24] ?? 0;
 }
 
-function getEnvelopeCcFromValue(value) {
+function getEnvelopeCcFromValue(value: number): number {
     const envelopeCcValues = [0, 9, 17, 26, 34, 43, 51, 60, 68, 77, 85, 94, 102, 111, 119, 127];
-    return envelopeCcValues[value] || 0;
+    return envelopeCcValues[value] ?? 0;
 }
 
-function getDetuneCcFromValue(value) {
+function getDetuneCcFromValue(value: number): number {
     return value < -30 ? value + 63 : value + 64;
 }
 
-function getArpeggiatorSpeedCcFromValue(value) {
+function getArpeggiatorSpeedCcFromValue(value: number): number {
     return value > 0 ? 128 - value : 0;
 }
 
-function getOscillatorCcNumberFromParamName(paramName) {
+function getOscillatorCcNumberFromParamName(paramName: string): number {
     const oscillator = GetParameter("Oscillator");
-    const oscillatorCcNumbers = {
+    const oscillatorCcNumbers: Record<string, [number, number, number]> = {
         Active: [24, 25, 26],
         "Arpeggiator Speed": [34, 50, 72],
         "Pitch/Track": [35, 51, 73],
@@ -220,8 +220,9 @@ function getOscillatorCcNumberFromParamName(paramName) {
     return oscillatorCcNumbers[paramName][oscillator];
 }
 
-function ParameterChanged(paramIndex, value) {
+function ParameterChanged(paramIndex: number, value: number): void {
     const paramName = getParamNameFromParamIndex(paramIndex);
+    if (!paramName) return;
     switch (paramName) {
         case "Active":
             sendCcValue(getOscillatorCcNumberFromParamName(paramName), getBooleanCcFromValue(value));
@@ -239,38 +240,20 @@ function ParameterChanged(paramIndex, value) {
             sendCcValue(getOscillatorCcNumberFromParamName(paramName), getArpeggiatorSpeedCcFromValue(value));
             break;
         case "Portamento":
-            sendCcValue(getOscillatorCcNumberFromParamName(paramName), value);
-            break;
         case "Vibrato Depth":
-            sendCcValue(getOscillatorCcNumberFromParamName(paramName), value);
-            break;
-        case "Sync":
-            sendCcValue(getOscillatorCcNumberFromParamName(paramName), getBooleanCcFromValue(value));
-            break;
-        case "Ring Mod":
-            sendCcValue(getOscillatorCcNumberFromParamName(paramName), getBooleanCcFromValue(value));
-            break;
         case "PWM Start":
-            sendCcValue(getOscillatorCcNumberFromParamName(paramName), value);
-            break;
         case "PWM Add":
-            sendCcValue(getOscillatorCcNumberFromParamName(paramName), value);
-            break;
         case "PWM LFO Depth":
-            sendCcValue(getOscillatorCcNumberFromParamName(paramName), value);
-            break;
         case "Delay":
             sendCcValue(getOscillatorCcNumberFromParamName(paramName), value);
             break;
+        case "Sync":
+        case "Ring Mod":
+            sendCcValue(getOscillatorCcNumberFromParamName(paramName), getBooleanCcFromValue(value));
+            break;
         case "Attack":
-            sendCcValue(getOscillatorCcNumberFromParamName(paramName), getEnvelopeCcFromValue(value));
-            break;
         case "Decay":
-            sendCcValue(getOscillatorCcNumberFromParamName(paramName), getEnvelopeCcFromValue(value));
-            break;
         case "Sustain":
-            sendCcValue(getOscillatorCcNumberFromParamName(paramName), getEnvelopeCcFromValue(value));
-            break;
         case "Release":
             sendCcValue(getOscillatorCcNumberFromParamName(paramName), getEnvelopeCcFromValue(value));
             break;

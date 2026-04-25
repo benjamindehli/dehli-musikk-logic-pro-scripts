@@ -9,7 +9,7 @@ import { getParamNameFromParamIndex, sendCcValue } from "../../functions/helpers
 
 const cc = new ControlChange();
 
-const PluginParameters = [
+const PluginParameters: ScripterPluginParameter[] = [
     {
         name: "ACTIVE",
         type: "menu",
@@ -103,12 +103,12 @@ const PluginParameters = [
     }
 ];
 
-function getArcadeButtonCcFromValue(value) {
+function getArcadeButtonCcFromValue(value: number): number {
     return value + 1;
 }
 
-function getCcNumberFromParamName(paramName) {
-    const oscillatorCcNumbers = {
+function getCcNumberFromParamName(paramName: string): number | undefined {
+    const oscillatorCcNumbers: Record<string, number> = {
         BASS: 14,
         MIDS: 15,
         CROSS: 16,
@@ -124,42 +124,19 @@ function getCcNumberFromParamName(paramName) {
     return oscillatorCcNumbers[paramName];
 }
 
-function ParameterChanged(paramIndex, value) {
+function ParameterChanged(paramIndex: number, value: number): void {
     const paramName = getParamNameFromParamIndex(paramIndex);
+    if (!paramName) return;
+    const ccNumber = getCcNumberFromParamName(paramName);
+    if (ccNumber === undefined) return;
     switch (paramName) {
-        case "ACTIVE":
-            sendCcValue(getCcNumberFromParamName(paramName), value);
-            break;
-        case "BASS":
-            sendCcValue(getCcNumberFromParamName(paramName), value);
-            break;
-        case "MIDS":
-            sendCcValue(getCcNumberFromParamName(paramName), value);
-            break;
-        case "CROSS":
-            sendCcValue(getCcNumberFromParamName(paramName), value);
-            break;
-        case "TREBLE":
-            sendCcValue(getCcNumberFromParamName(paramName), value);
-            break;
-        case "MIX":
-            sendCcValue(getCcNumberFromParamName(paramName), value);
-            break;
-        case "PRE-DLY":
-            sendCcValue(getCcNumberFromParamName(paramName), value);
-            break;
         case "TYPE":
-            sendCcValue(getCcNumberFromParamName(paramName), getArcadeButtonCcFromValue(value));
-            break;
         case "DIFFUSION":
-            sendCcValue(getCcNumberFromParamName(paramName), getArcadeButtonCcFromValue(value));
-            break;
         case "TANK MOD":
-            sendCcValue(getCcNumberFromParamName(paramName), getArcadeButtonCcFromValue(value));
-            break;
         case "CLOCK":
-            sendCcValue(getCcNumberFromParamName(paramName), getArcadeButtonCcFromValue(value));
+            sendCcValue(ccNumber, getArcadeButtonCcFromValue(value));
             break;
         default:
+            sendCcValue(ccNumber, value);
     }
 }
