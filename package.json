@@ -16,7 +16,8 @@
         "build"
     ],
     "scripts": {
-        "build": "logic-pro-script-compiler --input src/scripts --output build",
+        "build": "tsc && logic-pro-script-compiler --input dist-ts/scripts --output build",
+        "typecheck": "tsc --noEmit",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "keywords": [
@@ -25,7 +26,9 @@
         "scripter-plugin"
     ],
     "devDependencies": {
-        "@benjamindehli/logic-pro-script-compiler": "^1.0.7"
+        "@benjamindehli/logic-pro-script-compiler": "^1.0.7",
+        "typescript": "^6.0.3"
+    },
     "dependencies": {
         "@benjamindehli/logic-pro-scripter-utils": "^1.0.0"
     }
