@@ -44,5 +44,5 @@ Simulates strumming by spreading an incoming chord across time. Configurable str
 
 ```bash
 npm install
-npm run build   # compiles src/scripts/**/*.{js,mjs} → build/**/*.pst
+npm run build   # compiles src/scripts/**/*.{ts, mts} → build/**/*.pst
 ```
