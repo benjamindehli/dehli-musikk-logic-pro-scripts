@@ -2,6 +2,10 @@
 
 Logic Pro Scripter plugin scripts for controlling MIDI data. Published to npm as compiled `.pst` preset files ready to load in Logic Pro's Scripter MIDI plugin.
 
+## Download
+
+[Download latest release](https://github.com/benjamindehli/dehli-musikk-logic-pro-scripts/releases/latest/download/DehliMusikk-LogicProScripts.zip)
+
 ## Package
 
 ```text
